@@ -1,7 +1,5 @@
 # Capstone Project: Multi-Class Mental Health Classification
 
-This notebook presents a complete, end-to-end pipeline for classifying social media text into one of seven mental health-related categories. The workflow is structured into distinct phases, from data loading and cleaning to advanced model tuning and analysis.
-
 ## Project Flow
 
 ### 1. Phase 0: Setup and Environment
@@ -46,5 +44,3 @@ This notebook presents a complete, end-to-end pipeline for classifying social me
 * An in-depth analysis of the champion model is conducted, including a **Confusion Matrix** to visualize its errors and an extraction of the **Top Predictive Keywords** to understand its decision-making process.
 * The final trained model is saved to a file for future use.
 * The learning curves of the deep learning models are visualized to show their training progress.
-
-This structured approach ensures a thorough and scientific investigation, leading to a robust and well-understood final classification model.
