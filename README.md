@@ -1,46 +1,114 @@
-# Capstone Project: Multi-Class Mental Health Classification
+# Detecting Depression and Anxiety via Social Media Text Analysis
+**Capstone Project – MSc Data Science, VIT Vellore**
 
-## Project Flow
+This project presents a large-scale, multi-class mental health text classification system designed to detect psychological conditions from social media posts. The work rigorously compares classical machine learning models with transformer-based deep learning architectures, including the domain-specialized MentalBERT, to evaluate their effectiveness in real-world mental health signal detection.
 
-### 1. Phase 0: Setup and Environment
+## Objective
+To design and evaluate a multi-class NLP system capable of classifying social media text into seven mental health categories, and to empirically determine whether transformer-based models—particularly domain-adapted transformers—offer significant performance improvements over well-optimized classical machine learning baselines.
 
-* All necessary libraries for data manipulation (pandas), machine learning (scikit-learn), deep learning (TensorFlow/Keras), and visualization (matplotlib/seaborn) are imported.
-* A consistent random seed is set to ensure the reproducibility of all experiments.
+## Dataset
+* **Source:** Publicly available Reddit mental health communities
+* **Size:** 53,000+ posts
+* **Language:** English
+* **Task:** Multi-class classification
 
-### 2. Phase 1: Data Loading, Exploration, and Preprocessing
+### Categories (7)
+* Normal
+* Depression
+* Anxiety
+* Stress
+* Bipolar Disorder
+* Personality Disorder
+* Suicidal Ideation
 
-* The raw dataset is loaded and cleaned of any null values or duplicate entries.
-* An initial exploratory data analysis (EDA) is performed to visualize the class distribution, revealing a significant imbalance.
-* To address this, a balanced dataset is created by under-sampling 800 posts from each of the seven categories. This ensures the models are trained on a fair representation of the data.
-* A robust text preprocessing function is defined and applied. This function handles the expansion of contractions, conversion to lowercase, removal of noise (URLs, hashtags), and lemmatization, preparing the text for vectorization.
-* Finally, the preprocessed dataset is split into training (80%) and testing (20%) sets.
+To ensure fair model comparison, class imbalance was handled through controlled under-sampling during training experiments. Full dataset details are documented in the dissertation and summarized in the `data/` directory.
 
-### 3. Phase 2: Baseline Model Comparison
+## Methodology Overview
+The project follows a structured, research-driven workflow to ensure reproducibility, fairness, and interpretability.
 
-* Seven different classical machine learning models (including Logistic Regression, SVMs, and tree-based ensembles) are trained on the data using a `TfidfVectorizer`.
-* The performance of each model is evaluated using F1-score and accuracy.
-* A grouped bar chart is generated to visually compare the results, allowing for a clear identification of the top-performing baseline models.
+### 1. Data Preprocessing & EDA
+* Removal of null values and duplicate entries
+* Text normalization, noise removal, and lemmatization
+* Exploratory analysis revealed strong class imbalance and large variation in post length
+* Stratified train–test split applied to preserve class distribution
 
-### 4. Phase 3: Hyperparameter Tuning (GridSearchCV)
+### 2. Classical Machine Learning Baselines
+* TF-IDF feature extraction (up to 30,000 n-grams)
+* Eight classical models evaluated, including:
+    * Logistic Regression
+    * Linear SVC
+    * SGD
+    * Naive Bayes
+* Models compared using Accuracy and Macro F1-score
+* Logistic Regression (30k n-grams) emerged as the strongest classical baseline
 
-* The top-performing models from the baseline comparison undergo an exhaustive hyperparameter search using `GridSearchCV`.
-* This step systematically tests different combinations of settings to find the optimal configuration for each model, leading to the selection of a definitive "champion" classical model.
+### 3. Transformer-Based Models
+Fine-tuning of pretrained transformer architectures:
+* BERT
+* DistilBERT
+* RoBERTa
+* ClinicalBERT
+* MentalBERT (domain-specific)
 
-### 5. Phase 4: Deep Learning with LSTM
+Identical training and evaluation procedures were applied across models to ensure fair comparison.
 
-* The project then explores a deep learning approach by building a Bidirectional Long Short-Term Memory (LSTM) network.
-* The text data is specially prepared for the neural network through tokenization and padding.
-* A baseline LSTM is trained, followed by a hyperparameter search using `KerasTuner` to find its optimal architecture and learning rate.
+### 4. Evaluation & Analysis
+Metrics used:
+* Accuracy
+* Precision
+* Recall
+* Macro F1-score
+* Confusion matrices
 
-### 6. Phase 5: State-of-the-Art Transformer Models
+Additional analysis focused on:
+* Minority class detection (Suicidal Ideation, Personality Disorder)
+* Error patterns and misclassification behaviour
+* Impact of domain-specific pre-training
 
-* To benchmark against the latest in NLP, the project implements two Transformer models: DistilBERT and the larger BERT model.
-* These models are fine-tuned on the project's specific dataset, a common and effective technique for leveraging large, pre-trained language models.
+## Key Results
 
-### 7. Phase 6: Final Analysis and Conclusion
+### Best Classical Model
+**Logistic Regression (30k TF-IDF)**
+* Accuracy: 74.3%
+* Macro F1-score: 0.681
 
-* A final comparison chart is generated, showing the performance of the champion models from each phase (Tuned LinearSVC, Tuned LSTM, and Fine-Tuned Transformers).
-* The overall best-performing model is declared the project champion.
-* An in-depth analysis of the champion model is conducted, including a **Confusion Matrix** to visualize its errors and an extraction of the **Top Predictive Keywords** to understand its decision-making process.
-* The final trained model is saved to a file for future use.
-* The learning curves of the deep learning models are visualized to show their training progress.
+### Best Transformer Model
+**MentalBERT**
+* Accuracy: 84.0%
+* Macro F1-score: 0.840
+
+**Transformer models improved Macro F1-score by ~23% (relative) over classical baselines**
+
+Domain-specific pre-training (MentalBERT) significantly improved detection of:
+* Suicidal Ideation
+* Personality Disorder
+* Bipolar Disorder
+
+These gains were most pronounced in clinically complex and minority categories where keyword-based models struggled.
+
+## Key Learnings
+* Classical ML models provide interpretable and computationally efficient baselines but struggle with contextual and narrative language.
+* Transformer architectures substantially improve performance by capturing:
+    * contextual meaning
+    * negation
+    * indirect expressions
+    * narrative patterns
+* Domain-adapted transformers like MentalBERT offer measurable advantages over general-purpose language models in mental health text analysis.
+* Automated mental health classification should be used as a supportive screening tool, not a clinical diagnostic system.
+
+## Ethical Considerations & Limitations
+* The dataset consists of anonymized, publicly available social media posts.
+* Predictions are probabilistic and subject to error—especially for high-risk categories.
+* The system is not intended for autonomous clinical decision-making and must be paired with human oversight.
+* Results are specific to English-language Reddit data and may not generalize across platforms or cultures without further validation.
+
+## Academic Context
+This repository represents the implementation component of the MSc Data Science capstone thesis:
+
+**“Detecting Depression and Anxiety via Social Media Text Analysis”**
+
+VIT Vellore, School of Advanced Sciences
+
+November 2025
+
+The full dissertation contains detailed literature review, experimental design, statistical analysis, and discussion of results.
