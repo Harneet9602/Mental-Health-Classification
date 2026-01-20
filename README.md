@@ -44,10 +44,11 @@ The project follows a structured, research-driven workflow to ensure reproducibi
 
 ### 3. Transformer-Based Models
 Fine-tuning of pretrained transformer architectures:
-* BERT
 * DistilBERT
 * RoBERTa
 * ClinicalBERT
+* BioBERT
+* PubmedBERT
 * MentalBERT (domain-specific)
 
 Identical training and evaluation procedures were applied across models to ensure fair comparison.
