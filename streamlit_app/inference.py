@@ -78,6 +78,7 @@ def predict_text(text):
         id2label[i]: float(probs[i])
         for i in range(len(probs))
     }
+    predicted_label = max(results, key=results.get)
 
     explanation = None
     return predicted_label, results, explanation
