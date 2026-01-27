@@ -9,7 +9,7 @@ HF_TOKEN = os.environ.get("HF_TOKEN")
 # ----------------------
 # CONFIG
 # ----------------------
-MODEL_NAME = "mental/mental-bert-base-uncased"
+MODEL_NAME = "harneetkaur09/mentalbert-mental-health"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 LABELS = [
