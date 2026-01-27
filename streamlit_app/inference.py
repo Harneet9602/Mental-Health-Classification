@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import re
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+HF_TOKEN = os.environ.get("HF_TOKEN")
 
 # ----------------------
 # CONFIG
