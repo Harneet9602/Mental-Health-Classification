@@ -52,7 +52,7 @@ def minimal_clean(text):
 # ----------------------
 # PREDICTION FUNCTION
 # ----------------------
-def predict(text):
+def predict_text(text):
     text = minimal_clean(text)
 
     inputs = tokenizer(
