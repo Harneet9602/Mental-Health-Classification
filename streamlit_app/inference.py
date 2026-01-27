@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn.functional as F
 import re
@@ -24,17 +25,22 @@ LABELS = [
 label2id = {label: i for i, label in enumerate(LABELS)}
 id2label = {i: label for label, i in label2id.items()}
 
-
 # ----------------------
 # LOAD MODEL (ONCE)
 # ----------------------
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+tokenizer = AutoTokenizer.from_pretrained(
+    MODEL_NAME,
+    token=HF_TOKEN
+)
+
 model = AutoModelForSequenceClassification.from_pretrained(
     MODEL_NAME,
     num_labels=7,
     id2label=id2label,
-    label2id=label2id
+    label2id=label2id,
+    token=HF_TOKEN
 )
+
 model.to(DEVICE)
 model.eval()
 
