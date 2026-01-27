@@ -79,6 +79,5 @@ def predict_text(text):
         for i in range(len(probs))
     }
 
-    predicted_label = max(results, key=results.get)
-
-    return predicted_label, results
+    explanation = None
+    return predicted_label, results, explanation
