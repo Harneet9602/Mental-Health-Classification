@@ -30,10 +30,12 @@ st.markdown(
     }
 
     .stTextArea textarea {
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        font-size: 16px;
-    }
+    background-color: #f8f9fa !important;
+    color: #111111 !important;   /* 👈 FIX */
+    border-radius: 12px;
+    font-size: 16px;
+}
+
 
     .stButton button {
         border-radius: 10px;
