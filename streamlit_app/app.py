@@ -184,7 +184,7 @@ if analyze_btn:
             st.altair_chart(chart, use_container_width=True)
 
         # ==================================================
-        # 8. OPTIONAL EXPLANATION
+        # OPTIONAL EXPLANATION
         # ==================================================
         if explanation:
             with st.expander("ℹ️ Model Explanation"):
