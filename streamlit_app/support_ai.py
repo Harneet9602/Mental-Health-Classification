@@ -26,13 +26,14 @@ Probabilities = {results}
 
 Generate a supportive message appropriate to risk level.
 """
-
-    response = client.chat.completions.create(
-        model="llama3-8b-8192",
-        messages=[
-            {"role":"system","content":system_prompt},
-            {"role":"user","content":user_prompt}
-        ]
-    )
-
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role":"system","content":system_prompt},
+                {"role":"user","content":user_prompt}
+            ]
+        )
+        return response.choices[0].message.content
+    except Exception:
+        return "Support response temporarily unavailable."
