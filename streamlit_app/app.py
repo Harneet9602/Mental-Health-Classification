@@ -164,7 +164,7 @@ if analyze_btn:
             </div>
             """, unsafe_allow_html=True)
 
-            if results["Suicidal"] > 0.35
+            if results["Suicidal"] > 0.35:
                 st.error("⚠️ The text suggests possible serious distress.")
 
                 st.info("""
