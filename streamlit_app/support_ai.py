@@ -1,7 +1,10 @@
-import os
 from groq import Groq
+import os
 
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
+
 
 def get_support_message(user_text, label, results):
 
