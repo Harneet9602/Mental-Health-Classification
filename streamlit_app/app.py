@@ -113,7 +113,13 @@ if analyze_btn:
     else:
         with st.spinner("Running MentalBERT inference..."):
             label, results, explanation = predict_text(user_text)
-
+            
+            high_risk = False
+            if label == "Suicidal":
+                high_risk = True
+            elif label in ["Depression", "Stress", "Anxiety"]:
+                if results[label] > 0.6:
+                    high_risk = True
             sorted_preds = sorted(
                 results.items(),
                 key=lambda x: x[1],
@@ -182,13 +188,40 @@ if analyze_btn:
             ).properties(height=300)
 
             st.altair_chart(chart, use_container_width=True)
+            # ==================================================
+            #  CHATGPT SUPPORT RESPONSE
+            # ==================================================
+            if high_risk:
+                with st.spinner("Preparing supportive response..."):
+                    support_msg = get_support_message(user_text, label, results)
+            
+                st.markdown("---")
+            
+                if label == "Suicidal":
+                    st.error("⚠️ The text suggests possible serious distress.")
+                else:
+                    st.warning("You may be experiencing emotional distress.")
+            
+                st.write(support_msg)
+            
+                # India crisis resources (important safety layer)
+                if label == "Suicidal":
+                    st.info("""
+            If you are in India and need immediate support:
+            
+            • Kiran Mental Health Helpline: 1800-599-0019  
+            • Sneha Foundation: 044-24640050
+            
+            Please consider reaching out to someone you trust or a professional.
+            """)
 
-        # ==================================================
-        # OPTIONAL EXPLANATION
-        # ==================================================
-        if explanation:
-            with st.expander("ℹ️ Model Explanation"):
-                st.write(explanation)
+
+            # ==================================================
+            # OPTIONAL EXPLANATION
+            # ==================================================
+            if explanation:
+                with st.expander("ℹ️ Model Explanation"):
+                    st.write(explanation)
 
 st.markdown("---")
 
