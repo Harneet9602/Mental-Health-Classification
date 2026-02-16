@@ -1,242 +1,214 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
 from inference import predict_text
 from support_ai import get_support_message
 
-
 # ======================================================
-# 1. PAGE CONFIG
+# PAGE CONFIG
 # ======================================================
 st.set_page_config(
     page_title="MindSight | Mental Health NLP",
     page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 # ======================================================
-# 2. GLOBAL DARK MODE + CSS
+# THEME TOGGLE
 # ======================================================
-st.markdown(
-    """
+theme_mode = st.toggle("🌙 Dark Mode", value=True)
+
+if theme_mode:
+    st.markdown("""
     <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    body {
-        background-color: #0e1117;
-        color: white;
-    }
-
-    .stTextArea textarea {
-    background-color: #f8f9fa !important;
-    color: #111111 !important;   /* 👈 FIX */
-    border-radius: 12px;
-    font-size: 16px;
-}
-
-
-    .stButton button {
-        border-radius: 10px;
-        height: 3em;
-        font-size: 16px;
-    }
-
-    .result-card {
-        padding: 20px;
-        border-radius: 16px;
-        color: white;
-        margin-bottom: 20px;
-    }
+    body {background-color:#0e1117;color:white;}
+    .stTextArea textarea {background:#1a1f2b;color:white;border-radius:12px;}
     </style>
-    """,
-    unsafe_allow_html=True
-)
+    """, unsafe_allow_html=True)
+
+else:
+    st.markdown("""
+    <style>
+    body {background-color:#F7F9FC;color:black;}
+    .stTextArea textarea {background:white;color:black;border-radius:12px;}
+    </style>
+    """, unsafe_allow_html=True)
 
 # ======================================================
-# 3. SIDEBAR
+# HERO HEADER
 # ======================================================
-with st.sidebar:
-    st.image(
-        "https://cdn-icons-png.flaticon.com/512/3062/3062634.png",
-        width=80
-    )
-    st.title("MindSight")
-    st.caption("Mental Health NLP Analyzer")
-    st.markdown("---")
-
-    st.info(
-        "This app uses **MentalBERT**, a transformer model fine-tuned "
-        "to detect mental health signals from text."
-    )
-
-    st.warning(
-        "⚠️ **DISCLAIMER**\n\n"
-        "For academic & research use only. "
-        "Not a medical diagnostic tool."
-    )
+st.markdown("""
+<div style="
+background: linear-gradient(135deg,#667eea,#764ba2);
+padding:30px;
+border-radius:20px;
+color:white;
+margin-bottom:25px;
+">
+<h1>🧠 MindSight Mental Health Analyzer</h1>
+<p>AI-powered detection of Anxiety, Depression, Stress and Suicidal ideation signals.</p>
+</div>
+""", unsafe_allow_html=True)
 
 # ======================================================
-# 4. MAIN LAYOUT
+# CONTROL PANEL
 # ======================================================
-st.title("🧠 Mental Health Text Analyzer")
-st.markdown(
-    "Analyze text for **Anxiety, Depression, Stress, Suicidal ideation**, and more."
-)
+c1, c2, c3 = st.columns(3)
 
-col1, col2 = st.columns([1.6, 1])
+with c1:
+    sensitivity = st.slider("🎯 Sensitivity", 0.3, 0.9, 0.6)
+
+with c2:
+    show_chart = st.toggle("📊 Show Insights", value=True)
+
+with c3:
+    compact_mode = st.toggle("⚡ Compact Mode", value=False)
 
 # ======================================================
-# 5. INPUT
+# INPUT AREA
 # ======================================================
+col1, col2 = st.columns([1.6,1])
+
 with col1:
     st.subheader("📝 Input Text")
+
     user_text = st.text_area(
         "Paste text below:",
         height=260,
         placeholder="e.g. I feel exhausted and overwhelmed lately..."
     )
 
-    analyze_btn = st.button(
-        "🔍 Analyze Text",
-        use_container_width=True,
-        type="primary"
-    )
+    analyze_btn = st.button("🔍 Analyze Text", use_container_width=True)
 
 # ======================================================
-# 6. INFERENCE + RESULTS
+# INFERENCE
 # ======================================================
 if analyze_btn:
-    if user_text.strip() == "":
+
+    if user_text.strip()=="":
         st.error("Please enter some text.")
+
     else:
+
         with st.spinner("Running MentalBERT inference..."):
             label, results, explanation = predict_text(user_text)
-            
-            high_risk = False
-            if label == "Suicidal":
+
+        sorted_preds = sorted(results.items(), key=lambda x:x[1], reverse=True)
+
+        top1_label, top1_prob = sorted_preds[0]
+        top2_label, top2_prob = sorted_preds[1]
+
+        high_risk = False
+        if label == "Suicidal":
+            high_risk = True
+        elif label in ["Depression","Stress","Anxiety"]:
+            if results[label] > sensitivity:
                 high_risk = True
-            elif label in ["Depression", "Stress", "Anxiety"]:
-                if results[label] > 0.6:
-                    high_risk = True
-            sorted_preds = sorted(
-                results.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )
 
-            top1_label, top1_prob = sorted_preds[0]
-            top2_label, top2_prob = sorted_preds[1]
-
-        # ==================================================
-        # COLOR MAP
-        # ==================================================
-        color_map = {
-            "Normal": "#2ECC71",
-            "Anxiety": "#3498DB",
-            "Stress": "#F1C40F",
-            "Depression": "#7F8C8D",
-            "Bipolar": "#9B59B6",
-            "Suicidal": "#C0392B",
-            "Personality disorder": "#E67E22"
+        badge_colors = {
+            "Suicidal":"#ff4b4b",
+            "Depression":"#7F8C8D",
+            "Anxiety":"#3498DB",
+            "Stress":"#F1C40F",
+            "Normal":"#2ECC71"
         }
 
-        bg_color = color_map.get(top1_label, "#34495E")
-
         # ==================================================
-        # RESULTS CARD
+        # RESULT CARD
         # ==================================================
         with col2:
-            st.markdown(
-                f"""
-                <div class="result-card" style="background-color:{bg_color};">
-                    <h2>🥇 {top1_label}</h2>
-                    <h4>{top1_prob*100:.1f}% confidence</h4>
-                    <hr>
-                    <h4>🥈 Secondary: {top2_label}</h4>
-                    <p>{top2_prob*100:.1f}% confidence</p>
+
+            st.markdown(f"""
+            <span style="
+            background:{badge_colors.get(top1_label,'#888')};
+            padding:6px 12px;
+            border-radius:12px;
+            color:white;
+            font-weight:bold;">
+            {top1_label}
+            </span>
+            """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+            <div style="
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            padding:25px;
+            border-radius:18px;
+            box-shadow:0px 8px 24px rgba(0,0,0,0.3);
+            margin-top:10px;
+            ">
+            <h2>🥇 {top1_label}</h2>
+            <h3>{top1_prob*100:.1f}% confidence</h3>
+            <hr>
+            <p>🥈 Secondary: {top2_label} — {top2_prob*100:.1f}%</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # ==================================================
+        # CONFIDENCE BARS
+        # ==================================================
+        if show_chart:
+
+            df_probs = pd.DataFrame(list(results.items()), columns=["Condition","Probability"]).sort_values("Probability", ascending=False)
+
+            for cond, prob in df_probs.values:
+
+                color = "#ff4b4b" if cond=="Suicidal" else "#4facfe"
+
+                st.markdown(f"""
+                <div style="margin-bottom:10px;">
+                    <strong>{cond}</strong>
+                    <div style="background:#e6e6e6;border-radius:10px;overflow:hidden;">
+                        <div style="
+                        width:{prob*100}%;
+                        background:{color};
+                        padding:6px;
+                        color:white;">
+                        {prob*100:.1f}%
+                        </div>
+                    </div>
                 </div>
-                """,
-                unsafe_allow_html=True
-            )
+                """, unsafe_allow_html=True)
 
-            # ==================================================
-            # BAR CHART (ALTAIR)
-            # ==================================================
-            df_probs = pd.DataFrame(
-                list(results.items()),
-                columns=["Condition", "Probability"]
-            ).sort_values("Probability", ascending=False)
+        # ==================================================
+        # SUPPORT AI
+        # ==================================================
+        if high_risk:
 
-            chart = alt.Chart(df_probs).mark_bar().encode(
-                x=alt.X(
-                    "Probability",
-                    axis=alt.Axis(format="%"),
-                    scale=alt.Scale(domain=[0, 1])
-                ),
-                y=alt.Y("Condition", sort="-x"),
-                color=alt.Color(
-                    "Probability",
-                    scale=alt.Scale(scheme="blues"),
-                    legend=None
-                ),
-                tooltip=[
-                    "Condition",
-                    alt.Tooltip("Probability", format=".2%")
-                ]
-            ).properties(height=300)
+            support_msg = get_support_message(user_text, label, results)
 
-            st.altair_chart(chart, use_container_width=True)
-            # ==================================================
-            #  CHATGPT SUPPORT RESPONSE
-            # ==================================================
-            if high_risk:
-                with st.spinner("Preparing supportive response..."):
-                    support_msg = get_support_message(user_text, label, results)
-            
-                st.markdown("---")
-            
-                if label == "Suicidal":
-                    st.error("⚠️ The text suggests possible serious distress.")
-                else:
-                    st.warning("You may be experiencing emotional distress.")
-            
-                st.write(support_msg)
-            
-                # India crisis resources (important safety layer)
-                if label == "Suicidal":
-                    st.info("""
-            If you are in India and need immediate support:
-            
-            • Kiran Mental Health Helpline: 1800-599-0019  
-            • Sneha Foundation: 044-24640050
-            
-            Please consider reaching out to someone you trust or a professional.
-            """)
+            st.markdown(f"""
+            <div style="
+            background: linear-gradient(135deg,#ffecd2,#fcb69f);
+            padding:20px;
+            border-radius:16px;
+            margin-top:20px;">
+            <h4>🤝 Support Assistant</h4>
+            <p>{support_msg}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
+            if label=="Suicidal":
+                st.error("⚠️ The text suggests possible serious distress.")
 
-            # ==================================================
-            # OPTIONAL EXPLANATION
-            # ==================================================
-            if explanation:
-                with st.expander("ℹ️ Model Explanation"):
-                    st.write(explanation)
+                st.info("""
+If you are in India and need immediate support:
 
+• Kiran Mental Health Helpline: 1800-599-0019  
+• Sneha Foundation: 044-24640050
+""")
+
+# ======================================================
+# FOOTER
+# ======================================================
 st.markdown("---")
 
-st.markdown(
-"""
+st.markdown("""
 ### Try my Agentic AI Companion
-
-Holistic AI assistant for guided emotional support:
 
 GitHub:
 https://github.com/Harneet9602/Sehaj-Holistic-AI-Companion
 
 Live App:
 https://sehaj-holistic-ai-companion-mxmfmefmmhgtxcweevkx7e.streamlit.app/
-"""
-)
-
-
+""")
