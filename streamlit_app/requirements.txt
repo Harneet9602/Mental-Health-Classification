@@ -5,4 +5,4 @@ huggingface_hub
 pandas
 altair
 matplotlib
-openai
+groq
