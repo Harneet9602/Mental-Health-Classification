@@ -44,5 +44,6 @@ Generate a supportive message appropriate to risk level.
 
         return response.choices[0].message.content
 
-    except Exception:
-        return "Support response temporarily unavailable."
+    except Exception as e:
+        return f"GROQ ERROR: {str(e)}"
+
