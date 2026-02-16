@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import matplotlib.pyplot as plt
-
 from inference import predict_text
+from support_ai import get_support_message
+
 
 # ======================================================
 # 1. PAGE CONFIG
@@ -184,31 +184,26 @@ if analyze_btn:
             st.altair_chart(chart, use_container_width=True)
 
         # ==================================================
-        # 7. CONFIDENCE VISUALS
-        # ==================================================
-        st.markdown("---")
-        st.subheader("📈 Prediction Confidence")
-
-        fig1, ax1 = plt.subplots()
-        ax1.barh(df_probs["Condition"], df_probs["Probability"])
-        ax1.invert_yaxis()
-        ax1.set_xlim(0, 1)
-        ax1.set_xlabel("Probability")
-        st.pyplot(fig1)
-
-        fig2, ax2 = plt.subplots()
-        ax2.pie(
-            df_probs["Probability"],
-            labels=df_probs["Condition"],
-            autopct="%1.1f%%",
-            startangle=90
-        )
-        ax2.axis("equal")
-        st.pyplot(fig2)
-
-        # ==================================================
         # 8. OPTIONAL EXPLANATION
         # ==================================================
         if explanation:
             with st.expander("ℹ️ Model Explanation"):
                 st.write(explanation)
+
+st.markdown("---")
+
+st.markdown(
+"""
+### Try my Agentic AI Companion
+
+Holistic AI assistant for guided emotional support:
+
+GitHub:
+https://github.com/Harneet9602/Sehaj-Holistic-AI-Companion
+
+Live App:
+https://sehaj-holistic-ai-companion-mxmfmefmmhgtxcweevkx7e.streamlit.app/
+"""
+)
+
+
