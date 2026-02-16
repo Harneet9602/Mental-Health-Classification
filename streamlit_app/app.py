@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
+
 from inference import predict_text
 from support_ai import get_support_message
 
@@ -144,47 +146,7 @@ if analyze_btn:
             </div>
             """, unsafe_allow_html=True)
 
-        # ==================================================
-        # CONFIDENCE BARS
-        # ==================================================
-        if show_chart:
-
-            df_probs = pd.DataFrame(
-                list(results.items()),
-                columns=["Condition","Probability"]
-            ).sort_values("Probability", ascending=False)
-        
-            for cond, prob in df_probs.values:
-        
-                color = "#ff4b4b" if cond=="Suicidal" else "#4facfe"
-        
-                html = f"""
-                <div style="margin-bottom:14px;">
-        
-                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                        <span>{cond}</span>
-                        <span>{prob*100:.1f}%</span>
-                    </div>
-        
-                    <div style="
-                        width:100%;
-                        background:#e0e0e0;
-                        border-radius:8px;
-                        height:10px;
-                    ">
-                        <div style="
-                            width:{prob*100}%;
-                            background:{color};
-                            height:10px;
-                            border-radius:8px;
-                        "></div>
-                    </div>
-        
-                </div>
-                """
-        
-                st.markdown(html, unsafe_allow_html=True)
-        # ==================================================
+         # ==================================================
         # SUPPORT AI
         # ==================================================
         if high_risk:
@@ -202,7 +164,7 @@ if analyze_btn:
             </div>
             """, unsafe_allow_html=True)
 
-            if label=="Suicidal":
+            if results["Suicidal"] > 0.35
                 st.error("⚠️ The text suggests possible serious distress.")
 
                 st.info("""
@@ -211,6 +173,34 @@ If you are in India and need immediate support:
 • Kiran Mental Health Helpline: 1800-599-0019  
 • Sneha Foundation: 044-24640050
 """)
+
+        # ==================================================
+        # CONFIDENCE BARS
+        # ==================================================
+        if show_chart:
+
+            df_probs = pd.DataFrame(
+                list(results.items()),
+                columns=["Condition","Probability"]
+            ).sort_values("Probability", ascending=False)
+        
+            chart = alt.Chart(df_probs).mark_bar(
+                cornerRadiusTopRight=6,
+                cornerRadiusBottomRight=6
+            ).encode(
+                x=alt.X("Probability", scale=alt.Scale(domain=[0,1])),
+                y=alt.Y("Condition", sort="-x"),
+                color=alt.condition(
+                    alt.datum.Condition == "Suicidal",
+                    alt.value("#ff4b4b"),
+                    alt.value("#4facfe")
+                ),
+                tooltip=["Condition", alt.Tooltip("Probability", format=".2%")]
+            ).properties(height=300)
+        
+            st.altair_chart(chart, use_container_width=True)
+
+    
 
 # ======================================================
 # FOOTER
