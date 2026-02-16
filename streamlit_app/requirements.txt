@@ -6,3 +6,4 @@ pandas
 altair
 matplotlib
 groq
+python-dotenv
