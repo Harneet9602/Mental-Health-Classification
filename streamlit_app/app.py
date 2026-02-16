@@ -149,39 +149,41 @@ if analyze_btn:
         # ==================================================
         if show_chart:
 
-            df_probs = pd.DataFrame(list(results.items()), columns=["Condition","Probability"]).sort_values("Probability", ascending=False)
-
+            df_probs = pd.DataFrame(
+                list(results.items()),
+                columns=["Condition","Probability"]
+            ).sort_values("Probability", ascending=False)
+        
             for cond, prob in df_probs.values:
-
+        
                 color = "#ff4b4b" if cond=="Suicidal" else "#4facfe"
-            
-                st.markdown(f"""
-                <div style="margin-bottom:12px;">
-                    <div style="display:flex;justify-content:space-between;">
+        
+                html = f"""
+                <div style="margin-bottom:14px;">
+        
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
                         <span>{cond}</span>
                         <span>{prob*100:.1f}%</span>
                     </div>
-            
+        
                     <div style="
                         width:100%;
                         background:#e0e0e0;
                         border-radius:8px;
-                        height:12px;
-                        overflow:hidden;
+                        height:10px;
                     ">
-                    <div style="
-                        width:{prob*100}%;
-                        background:{color};
-                        height:12px;
-                    ">
+                        <div style="
+                            width:{prob*100}%;
+                            background:{color};
+                            height:10px;
+                            border-radius:8px;
+                        "></div>
                     </div>
-                    
+        
                 </div>
-                
-            </div>
-            """, unsafe_allow_html=True)
-
-
+                """
+        
+                st.markdown(html, unsafe_allow_html=True)
         # ==================================================
         # SUPPORT AI
         # ==================================================
