@@ -1,7 +1,7 @@
 import os
-from openai import OpenAI
+from groq import Groq
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 def get_support_message(user_text, label, results):
 
@@ -28,7 +28,7 @@ Generate a supportive message appropriate to risk level.
 """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="llama3-8b-8192",
         messages=[
             {"role":"system","content":system_prompt},
             {"role":"user","content":user_prompt}
