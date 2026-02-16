@@ -154,21 +154,33 @@ if analyze_btn:
             for cond, prob in df_probs.values:
 
                 color = "#ff4b4b" if cond=="Suicidal" else "#4facfe"
-
+            
                 st.markdown(f"""
-                <div style="margin-bottom:10px;">
-                    <strong>{cond}</strong>
-                    <div style="background:#e6e6e6;border-radius:10px;overflow:hidden;">
-                        <div style="
+                <div style="margin-bottom:12px;">
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>{cond}</span>
+                        <span>{prob*100:.1f}%</span>
+                    </div>
+            
+                    <div style="
+                        width:100%;
+                        background:#e0e0e0;
+                        border-radius:8px;
+                        height:12px;
+                        overflow:hidden;
+                    ">
+                    <div style="
                         width:{prob*100}%;
                         background:{color};
-                        padding:6px;
-                        color:white;">
-                        {prob*100:.1f}%
-                        </div>
+                        height:12px;
+                    ">
                     </div>
+                    
                 </div>
-                """, unsafe_allow_html=True)
+                
+            </div>
+            """, unsafe_allow_html=True)
+
 
         # ==================================================
         # SUPPORT AI
